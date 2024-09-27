@@ -16,18 +16,18 @@
   5.Genre-specific Directors: Identified directors who created both comedy and horror movies.
   
 # Data Cleaning And Transformation:
-1.Handling Foreign Character- To handle this i changed data type of title in schema from VARCHAR TO NVARCHAR
+1.Handling Foreign Character- To handle this changed data type of title in schema from VARCHAR TO NVARCHAR
       
        [title] [nvarchar](200) NULL
 
 2.Removing Duplicates-
 
-.select show_id,COUNT(*) 
+select show_id,COUNT(*) 
 from netflix_raw
 group by show_id 
 having COUNT(*)>1
 
-.select * from netflix_raw
+select * from netflix_raw
 where concat(upper(title),type)  in (
 select concat(upper(title),type) 
 from netflix_raw
@@ -36,7 +36,7 @@ having COUNT(*)>1
 )
 order by title
 
-.with cte as (
+with cte as (
 select * 
 ,ROW_NUMBER() over(partition by title , type order by show_id) as rn
 from netflix_raw
@@ -67,11 +67,12 @@ select show_id , trim(value) as countries
 
 
 
---netflix data analysis
+# Netflix data analysis
 
-/*1  for each director count the no of movies and tv shows created by them in separate columns 
-for directors who have created tv shows and movies both */
-select nd.director 
+# 1] for each director count the no of movies and tv shows created by them in separate columns 
+for directors who have created tv shows and movies both
+
+ select nd.director 
 ,COUNT(distinct case when n.type='Movie' then n.show_id end) as no_of_movies
 ,COUNT(distinct case when n.type='TV Show' then n.show_id end) as no_of_tvshow
 from netflix n
@@ -80,7 +81,7 @@ group by nd.director
 having COUNT(distinct n.type)>1
 
 
---2 which country has highest number of comedy movies 
+# 2] which country has highest number of comedy movies 
 select  top 1 nc.country , COUNT(distinct ng.show_id ) as no_of_movies
 from netflix_genre ng
 inner join netflix_country nc on ng.show_id=nc.show_id
@@ -90,7 +91,7 @@ group by  nc.country
 order by no_of_movies desc
 
 
---3 for each year (as per date added to netflix), which director has maximum number of movies released
+# 3] for each year (as per date added to netflix), which director has maximum number of movies released
 with cte as (
 select nd.director,YEAR(date_added) as date_year,count(n.show_id) as no_of_movies
 from netflix n
@@ -108,16 +109,16 @@ select * from cte2 where rn=1
 
 
 
---4 what is average duration of movies in each genre
+# 4] what is average duration of movies in each genre
 select ng.genre , avg(cast(REPLACE(duration,' min','') AS int)) as avg_duration
 from netflix n
 inner join netflix_genre ng on n.show_id=ng.show_id
 where type='Movie'
 group by ng.genre
 
---5  find the list of directors who have created horror and comedy movies both.
--- display director names along with number of comedy and horror movies directed by them 
-select nd.director
+# 5]  find the list of directors who have created horror and comedy movies both.
+   #   display director names along with number of comedy and horror movies directed by them 
+  select nd.director
 , count(distinct case when ng.genre='Comedies' then n.show_id end) as no_of_comedy 
 , count(distinct case when ng.genre='Horror Movies' then n.show_id end) as no_of_horror
 from netflix n
