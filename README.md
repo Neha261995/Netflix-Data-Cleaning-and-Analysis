@@ -22,10 +22,11 @@
 
 2.Removing Duplicates-
 
-select show_id,COUNT(*) 
-from netflix_raw
-group by show_id 
-having COUNT(*)>1
+```
+  select show_id,COUNT(*) 
+  from netflix_raw
+  group by show_id 
+  having COUNT(*)>1
 
 select * from netflix_raw
 where concat(upper(title),type)  in (
@@ -44,7 +45,8 @@ from netflix_raw
 select show_id,type,title,cast(date_added as date) as date_added,release_year
 ,rating,case when duration is null then rating else duration end as duration,description
 into netflix
-from cte   
+from cte ;
+```  
 
 3.Data Type Coverstion--Changing data type of date added column as date
   
