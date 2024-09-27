@@ -78,29 +78,34 @@ from cte;
 
 # Netflix data analysis
 
-# 1] for each director count the no of movies and tv shows created by them in separate columns 
+ 1] for each director count the no of movies and tv shows created by them in separate columns 
 for directors who have created tv shows and movies both
 
+ ```
  select nd.director 
-,COUNT(distinct case when n.type='Movie' then n.show_id end) as no_of_movies
-,COUNT(distinct case when n.type='TV Show' then n.show_id end) as no_of_tvshow
-from netflix n
-inner join netflix_directors nd on n.show_id=nd.show_id
-group by nd.director
-having COUNT(distinct n.type)>1
+ ,COUNT(distinct case when n.type='Movie' then n.show_id end) as no_of_movies
+ ,COUNT(distinct case when n.type='TV Show' then n.show_id end) as no_of_tvshow
+ from netflix n
+ inner join netflix_directors nd on n.show_id=nd.show_id
+ group by nd.director
+ having COUNT(distinct n.type)>1;
+```
 
 
-# 2] which country has highest number of comedy movies 
+ 2] which country has highest number of comedy movies 
+```
 select  top 1 nc.country , COUNT(distinct ng.show_id ) as no_of_movies
 from netflix_genre ng
 inner join netflix_country nc on ng.show_id=nc.show_id
 inner join netflix n on ng.show_id=nc.show_id
 where ng.genre='Comedies' and n.type='Movie'
 group by  nc.country
-order by no_of_movies desc
+order by no_of_movies desc;
+```
 
 
-# 3] for each year (as per date added to netflix), which director has maximum number of movies released
+ 3] for each year (as per date added to netflix), which director has maximum number of movies released
+```
 with cte as (
 select nd.director,YEAR(date_added) as date_year,count(n.show_id) as no_of_movies
 from netflix n
@@ -115,19 +120,23 @@ from cte
 --order by date_year, no_of_movies desc
 )
 select * from cte2 where rn=1
+```
 
 
 
-# 4] what is average duration of movies in each genre
+ 4] what is average duration of movies in each genre
+```
 select ng.genre , avg(cast(REPLACE(duration,' min','') AS int)) as avg_duration
 from netflix n
 inner join netflix_genre ng on n.show_id=ng.show_id
 where type='Movie'
-group by ng.genre
+group by ng.genre;
+```
 
-# 5]  find the list of directors who have created horror and comedy movies both.
-   #   display director names along with number of comedy and horror movies directed by them 
-  select nd.director
+ 5]  find the list of directors who have created horror and comedy movies both.
+    display director names along with number of comedy and horror movies directed by them 
+```
+select nd.director
 , count(distinct case when ng.genre='Comedies' then n.show_id end) as no_of_comedy 
 , count(distinct case when ng.genre='Horror Movies' then n.show_id end) as no_of_horror
 from netflix n
@@ -136,3 +145,11 @@ inner join netflix_directors nd on n.show_id=nd.show_id
 where type='Movie' and ng.genre in ('Comedies','Horror Movies')
 group by nd.director
 having COUNT(distinct ng.genre)=2;
+```
+
+
+# Conclusion: 
+
+This project demonstrates a robust application of SQL and Python in real-world data analysis, emphasizing practical data cleaning, manipulation, and visualization skills that are crucial for any data-driven decision-making process.
+
+
